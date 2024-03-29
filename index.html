@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle Magic Number</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        width: 100%;
+        max-width: 400px;
+        margin: 20px auto; /* Center the container horizontally */
+        padding: 20px;
+    }
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-top: 0;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .form-input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .btn {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .btn:hover {
+        background-color: #0056b3;
+    }
+    .output {
+        margin-top: 20px;
+        overflow-x: auto;
+    }
+    .vehicleOutput {
+        margin-top: 20px;
+        overflow-x: auto;
+        font-size: 20px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: center;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    .pagination {
+        text-align: center;
+    }
+    .pagination button {
+        margin: 5px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .pagination button:hover {
+        background-color: #0056b3;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Lucky Number for your Vehicle Number Plate </h1>
+    <div class="form-group">
+        <label class="form-label">Select Calculation Type:</label>
+        <div>
+            <input type="radio" id="vehicleNumRadio" name="calculationType" value="vehicleNum" checked>
+            <label for="vehicleNumRadio">Do you want to directly enter the Vehicle Number?</label>
+        </div>
+        <div>
+            <input type="radio" id="alphaNumRadio" name="calculationType" value="alphaNum">
+            <label for="alphaNumRadio">Do you want to calculate for a range of numbers?</label>
+        </div>
+    </div>
+    <div id="vehicleNumSection">
+        <div class="form-group">
+            <label for="vehicleNum" class="form-label">Enter the Vehicle Number (Ex: KA02MV2525):</label>
+            <input type="text" id="vehicleNum" class="form-input" placeholder="Vehicle Number">
+        </div>
+        <button class="btn" onclick="vehicleNumCalculate()">Calculate</button>
+        <div class="vehicleOutput" id="vehicleOutput"></div>
+    </div>
+    <div id="alphaNumSection" style="display: none;">
+        <!-- <h1>Calculate for a range of numbers</h1> -->
+        <div class="form-group">
+            <label for="alphaPart" class="form-label">Enter the first 6 characters (Ex: KA02MV) :</label>
+            <input type="text" id="alphaPart" class="form-input" placeholder="Alpha part">
+        </div>
+        <div class="form-group">
+            <label for="lowerNumeric" class="form-label">Enter the 4 digit lower bound (Ex: 6000):</label>
+            <input type="number" id="lowerNumeric" class="form-input" placeholder="Lower bound">
+        </div>
+        <div class="form-group">
+            <label for="upperNumeric" class="form-label">Enter the 4 digit upper bound (Ex: 6100):</label>
+            <input type="number" id="upperNumeric" class="form-input" placeholder="Upper bound">
+        </div>
+        <div class="form-group">
+            <label for="singleDigit">Select a single digit:</label>
+            <select id="singleDigit" class="form-input">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+            </select>
+        </div>
+        <button class="btn" onclick="calculate()">Calculate</button>
+        <div class="output" id="output"></div>
+    </div>
+</div>
+
+<script>
+const alphabetValues = {
+    'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'U': 6, 'O': 7, 'P': 8,
+    'I': 1, 'K': 2, 'G': 3, 'M': 4, 'H': 5, 'V': 6, 'Z': 7, 'F': 8,
+    'Q': 1, 'R': 2, 'L': 3, 'T': 4, 'N': 5, 'W': 6, 'J': 1, 'S': 3, 'X': 5, 'Y': 1
+};
+
+// Function to calculate the numerical value of a string based on the alphabetValues
+function calculateValue(input) {
+    const letters = input.toUpperCase().split('');
+    let total = 0;
+    for (let i = 0; i < letters.length; i++) {
+        const letter = letters[i];
+        if (alphabetValues.hasOwnProperty(letter)) {
+            total += alphabetValues[letter];
+        } else if (!isNaN(parseInt(letter))) {
+            // If the character is a digit, add its numerical value directly
+            total += parseInt(letter);
+        }
+    }
+    return total;
+}
+document.getElementById('vehicleNum').addEventListener('input', function() {
+    let value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+    if (value !== this.value) {
+        this.value = value;
+    }
+});
+function vehicleNumCalculate() {
+    const vehicleNumber = document.getElementById('vehicleNum').value.toUpperCase();
+    let magicNumber = 0;
+    for (let i = 0; i < vehicleNumber.length; i++) {
+        const char = vehicleNumber[i];
+        if (!isNaN(parseInt(char))) {
+            magicNumber += parseInt(char);
+        } else if (alphabetValues.hasOwnProperty(char)) {
+            magicNumber += alphabetValues[char];
+        }
+    }
+    document.getElementById('vehicleOutput').textContent = `Magic Number of Vehicle Number ${vehicleNumber}: ${magicNumber}`;
+}
+
+let filteredData = [];
+let currentPage = 1;
+const rowsPerPage = 10;
+
+document.getElementById('alphaPart').addEventListener('input', function() {
+    let value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+    if (value !== this.value) {
+        this.value = value;
+    }
+});
+
+document.getElementById('lowerNumeric').addEventListener('input', function() {
+    let value = this.value.trim().slice(0, 4);
+    this.value = value;
+});
+
+document.getElementById('upperNumeric').addEventListener('input', function() {
+    let value = this.value.trim().slice(0, 4);
+    this.value = value;
+});
+
+function calculate() {
+    const alphaPart = document.getElementById('alphaPart').value.trim().slice(0, 6);
+    const lowerNumeric = parseInt(document.getElementById('lowerNumeric').value.trim().slice(0, 4));
+    const upperNumeric = parseInt(document.getElementById('upperNumeric').value.trim().slice(0, 4));
+    const singleDigit = parseInt(document.getElementById('singleDigit').value);
+
+    if (!alphaPart || isNaN(lowerNumeric) || isNaN(upperNumeric) || isNaN(singleDigit) || lowerNumeric > upperNumeric) {
+        alert("Please enter valid values for alpha part, numeric range, and single digit.");
+        return;
+    }
+
+    filteredData = []; // Clear previous filtered data
+    for (let i = lowerNumeric; i <= upperNumeric; i++) {
+        const numericPart = i.toString().padStart(4, '0');
+        const alphaTotal = calculateValue(alphaPart);
+        const numericTotal = [...numericPart].reduce((acc, digit) => acc + parseInt(digit), 0);
+        let total = alphaTotal + numericTotal + singleDigit;
+
+        // Keep adding digits until total becomes a single digit
+        let singleDigitTotal = total;
+        while (singleDigitTotal >= 10) {
+            singleDigitTotal = singleDigitTotal.toString().split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+        }
+
+        // Concatenate alpha and numeric parts for display in one column
+        const alphaNumericPart = `${alphaPart}${numericPart}`;
+
+        // Check if the single-digit total matches the selected single digit
+        if (singleDigitTotal === singleDigit) {
+            filteredData.push({
+                alphaNumericPart: alphaNumericPart,
+                total: total,
+                singleDigitTotal: singleDigitTotal
+            });
+        }
+    }
+
+    currentPage = 1;
+    renderData();
+}
+
+function renderData() {
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerHTML = ''; // Clear previous results
+
+    const table = document.createElement('table');
+    table.innerHTML = `
+        <tr>
+            <th>Alpha-Numeric Part</th>
+            <th>Total Sum</th>
+            <th>Single-Digit Total</th>
+        </tr>
+    `;
+
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = Math.min(startIndex + rowsPerPage, filteredData.length);
+
+    for (let i = startIndex; i < endIndex; i++) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${filteredData[i].alphaNumericPart}</td>
+            <td>${filteredData[i].total}</td>
+            <td>${filteredData[i].singleDigitTotal}</td>
+        `;
+        table.appendChild(row);
+    }
+
+    outputDiv.appendChild(table);
+    renderPagination();
+}
+
+function renderPagination() {
+    const outputDiv = document.getElementById('output');
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    const paginationDiv = document.createElement('div');
+    paginationDiv.classList.add('pagination');
+
+    if (currentPage > 1) {
+        const prevButton = document.createElement('button');
+        prevButton.textContent = 'Previous';
+        prevButton.addEventListener('click', () => {
+            currentPage--;
+            renderData();
+        });
+        paginationDiv.appendChild(prevButton);
+    }
+
+    if (currentPage < totalPages) {
+        const nextButton = document.createElement('button');
+        nextButton.textContent = 'Next';
+        nextButton.addEventListener('click', () => {
+            currentPage++;
+            renderData();
+        });
+        paginationDiv.appendChild(nextButton);
+    }
+
+    outputDiv.appendChild(paginationDiv);
+}
+
+// Event listener for radio buttons
+document.querySelectorAll('input[name="calculationType"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+        if (radio.value === 'vehicleNum') {
+            document.getElementById('vehicleNumSection').style.display = 'block';
+            document.getElementById('alphaNumSection').style.display = 'none';
+        } else if (radio.value === 'alphaNum') {
+            document.getElementById('vehicleNumSection').style.display = 'none';
+            document.getElementById('alphaNumSection').style.display = 'block';
+        }
+    });
+});
+</script>
+</body>
+</html>
