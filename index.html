@@ -9,39 +9,51 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
+        background-color: #f5f5f5;
     }
     .container {
         width: 100%;
-        max-width: 400px;
+        max-width: 600px;
         margin: 20px auto; /* Center the container horizontally */
         padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
     h1 {
         color: #333;
         text-align: center;
         margin-top: 0;
     }
+    p {
+        color: #666;
+        text-align: center;
+    }
     .form-group {
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
     .form-label {
         display: block;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
+        color: #333;
     }
     .form-input {
         width: 100%;
-        padding: 8px;
+        padding: 10px;
         border: 1px solid #ccc;
         border-radius: 4px;
+        font-size: 16px;
     }
     .btn {
         width: 100%;
-        padding: 10px;
+        padding: 12px;
         background-color: #007bff;
         color: #fff;
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
     }
     .btn:hover {
         background-color: #0056b3;
@@ -50,18 +62,14 @@
         margin-top: 20px;
         overflow-x: auto;
     }
-    .vehicleOutput {
-        margin-top: 20px;
-        overflow-x: auto;
-        font-size: 20px;
-    }
     table {
         width: 100%;
         border-collapse: collapse;
+        margin-top: 20px;
     }
     th, td {
         border: 1px solid #ccc;
-        padding: 8px;
+        padding: 12px;
         text-align: center;
     }
     th {
@@ -69,15 +77,18 @@
     }
     .pagination {
         text-align: center;
+        margin-top: 20px;
     }
     .pagination button {
         margin: 5px;
-        padding: 5px 10px;
+        padding: 8px 16px;
         background-color: #007bff;
         color: #fff;
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
     }
     .pagination button:hover {
         background-color: #0056b3;
@@ -86,16 +97,20 @@
 </head>
 <body>
 <div class="container">
-    <h1>Lucky Number for your Vehicle Number Plate </h1>
+    <h1>Lucky Number for Your Vehicle Number Plate</h1>
+
+    <p>
+        With our innovative tool, you can now unveil the lucky number for your vehicle's number plate effortlessly. Choose from two convenient calculation types:
+    </p>
     <div class="form-group">
         <label class="form-label">Select Calculation Type:</label>
         <div>
             <input type="radio" id="vehicleNumRadio" name="calculationType" value="vehicleNum" checked>
-            <label for="vehicleNumRadio">Do you want to directly enter the Vehicle Number?</label>
+            <label for="vehicleNumRadio">Direct Entry: Enter Vehicle Number</label>
         </div>
         <div>
             <input type="radio" id="alphaNumRadio" name="calculationType" value="alphaNum">
-            <label for="alphaNumRadio">Do you want to calculate for a range of numbers?</label>
+            <label for="alphaNumRadio">Range Calculation: Calculate for a Range of Numbers</label>
         </div>
     </div>
     <div id="vehicleNumSection">
@@ -103,25 +118,24 @@
             <label for="vehicleNum" class="form-label">Enter the Vehicle Number (Ex: KA02XX0000):</label>
             <input type="text" id="vehicleNum" class="form-input" placeholder="Vehicle Number">
         </div>
-        <button class="btn" onclick="vehicleNumCalculate()">Calculate</button>
+        <button class="btn" onclick="vehicleNumCalculate()">Calculate Lucky Number</button>
         <div class="vehicleOutput" id="vehicleOutput"></div>
     </div>
     <div id="alphaNumSection" style="display: none;">
-        <!-- <h1>Calculate for a range of numbers</h1> -->
         <div class="form-group">
-            <label for="alphaPart" class="form-label">Enter the first 6 characters (Ex: KA02MV) :</label>
+            <label for="alphaPart" class="form-label">Enter the First 6 Characters (Ex: KA02MV):</label>
             <input type="text" id="alphaPart" class="form-input" placeholder="Alpha part">
         </div>
         <div class="form-group">
-            <label for="lowerNumeric" class="form-label">Enter the 4 digit lower bound (Ex: 6000):</label>
+            <label for="lowerNumeric" class="form-label">Enter the 4-Digit Lower Bound:</label>
             <input type="number" id="lowerNumeric" class="form-input" placeholder="Lower bound">
         </div>
         <div class="form-group">
-            <label for="upperNumeric" class="form-label">Enter the 4 digit upper bound (Ex: 6100):</label>
+            <label for="upperNumeric" class="form-label">Enter the 4-Digit Upper Bound:</label>
             <input type="number" id="upperNumeric" class="form-input" placeholder="Upper bound">
         </div>
         <div class="form-group">
-            <label for="singleDigit">Select a single digit:</label>
+            <label for="singleDigit">Select a Single Digit:</label>
             <select id="singleDigit" class="form-input">
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -134,7 +148,7 @@
                 <option value="9">9</option>
             </select>
         </div>
-        <button class="btn" onclick="calculate()">Calculate</button>
+        <button class="btn" onclick="calculate()">Calculate Lucky Numbers</button>
         <div class="output" id="output"></div>
     </div>
 </div>
@@ -161,12 +175,16 @@ function calculateValue(input) {
     }
     return total;
 }
+
+// Function to limit input to alphanumeric characters only
 document.getElementById('vehicleNum').addEventListener('input', function() {
     let value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
     if (value !== this.value) {
         this.value = value;
     }
 });
+
+// Function to calculate the lucky number for directly entered vehicle number
 function vehicleNumCalculate() {
     const vehicleNumber = document.getElementById('vehicleNum').value.toUpperCase();
     let magicNumber = 0;
@@ -178,13 +196,14 @@ function vehicleNumCalculate() {
             magicNumber += alphabetValues[char];
         }
     }
-    document.getElementById('vehicleOutput').textContent = `Magic Number of Vehicle Number ${vehicleNumber}: ${magicNumber}`;
+    document.getElementById('vehicleOutput').textContent = `Lucky Number of Vehicle Number ${vehicleNumber}: ${magicNumber}`;
 }
 
 let filteredData = [];
 let currentPage = 1;
 const rowsPerPage = 10;
 
+// Function to limit input to alphanumeric characters only for the alpha part
 document.getElementById('alphaPart').addEventListener('input', function() {
     let value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
     if (value !== this.value) {
@@ -192,6 +211,7 @@ document.getElementById('alphaPart').addEventListener('input', function() {
     }
 });
 
+// Functions to limit input to 4 digits for lower and upper numeric bounds
 document.getElementById('lowerNumeric').addEventListener('input', function() {
     let value = this.value.trim().slice(0, 4);
     this.value = value;
@@ -202,6 +222,7 @@ document.getElementById('upperNumeric').addEventListener('input', function() {
     this.value = value;
 });
 
+// Function to calculate lucky numbers for the range of numbers
 function calculate() {
     const alphaPart = document.getElementById('alphaPart').value.trim().slice(0, 6);
     const lowerNumeric = parseInt(document.getElementById('lowerNumeric').value.trim().slice(0, 4));
@@ -243,6 +264,7 @@ function calculate() {
     renderData();
 }
 
+// Function to render the filtered data in a table with pagination
 function renderData() {
     const outputDiv = document.getElementById('output');
     outputDiv.innerHTML = ''; // Clear previous results
@@ -273,6 +295,7 @@ function renderData() {
     renderPagination();
 }
 
+// Function to render pagination buttons
 function renderPagination() {
     const outputDiv = document.getElementById('output');
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
@@ -302,7 +325,7 @@ function renderPagination() {
     outputDiv.appendChild(paginationDiv);
 }
 
-// Event listener for radio buttons
+// Event listener for radio buttons to toggle between calculation types
 document.querySelectorAll('input[name="calculationType"]').forEach((radio) => {
     radio.addEventListener('change', () => {
         if (radio.value === 'vehicleNum') {
